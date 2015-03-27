@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+    <link href='//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css' rel='stylesheet'>
+    <title>Twitter Stream</title>
+  </head>
+  <body>
+    <header></header>
+    <div class='container' id='container'>
+      <div class='row'>
+        <div class='col-md-12' id="tweet">
+          <div v-repeat='tweets | orderBy "id" -1'>
+            <div class="icon">
+              <a href="#">
+                <img v-attr='src: user.profile_image_url'>
+              </a>
+            </div>
+            <div class='text'>
+              <span class='user_name' v-text='user.name'></span>
+              <span class='screen_name' v-text='user.screen_name'></span>
+              <br/>
+              {{text}}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <footer class='footer'></footer>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src='//cdnjs.cloudflare.com/ajax/libs/vue/0.11.5/vue.min.js'></script>
+    <!--[if lt IE 9]>
+      <script src='//html5shim.googlecode.com/svn/trunk/html5.js'></script>
+      <script src='//oss.maxcdn.com/respond/1.4.2/respond.min.js'></script>
+    <![endif]-->
+    <script type="text/javascript">
+      var vue = new Vue({
+        el: '#tweet',
+        data: {
+          tweets: [],
+          limit: 20
+        },
+        methods: {
+          append: function(tweet) {
+            this.tweets.push(tweet);
+            if(this.tweets.length > this.limit) {
+              this.tweets.shift();
+            }
+          }
+        }
+      });
+
+      var socket = io.connect();
+      socket.on('msg', function(data) {
+        vue.append(data);
+      });
+    </script>
+  </body>
+</html>
+

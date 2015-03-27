@@ -1,0 +1,17 @@
+{
+  "name": "twistream",
+  "version": "1.0.0",
+  "description": "for Twitter Streaming API",
+  "main": "twistream.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "mostlyfine",
+  "license": "ISC",
+  "devDependencies": {
+    "coffee-script": "^1.9.1",
+    "express": "^4.12.3",
+    "socket.io": "^1.3.5",
+    "twitter": "^1.2.5"
+  }
+}
