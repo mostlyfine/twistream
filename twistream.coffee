@@ -1,39 +1,24 @@
-app    = require('express')()
-server = require('http').Server(app)
-io     = require('socket.io').listen(server)
-
 twitter = require 'twitter'
-client = new twitter(
-  consumer_key: process.env.TWITTER_CONSUMER_KEY
-  consumer_secret: process.env.TWITTER_CONSUMER_SECRET
-  access_token_key: process.env.TWITTER_ACCESS_TOKEN_KEY
-  access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET
-)
+twit = new twitter({
+  consumer_key: process.env.TWITTER_CONSUMER_KEY,
+  consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
+  access_token_key: process.env.TWITTER_ACCESS_TOKEN_KEY,
+  access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET,
+})
 
-io.sockets.on('connection', (socket) ->
-  console.log('connected')
+keyword = process.env.KEYWORD || '#photo'
 
-  socket.on('msg', (data) ->
-    io.sockets.emit('msg', data)
-  )
-  socket.on('disconnect', -> console.log('disconnected'))
-)
+server = require('http').createServer (req, res) ->
+  res.writeHead 200, {'Content-type': 'text/html'}
+  res.end require('fs').readFileSync('index.html')
+.listen(process.env.PORT || 3000)
 
-app.get('/', (req, res) ->
-  res.sendFile(__dirname + '/index.html')
-)
+io = require('socket.io').listen(server)
 
-keyword = '#cat'
-option = track: keyword
-
-client.stream('statuses/filter', option, (stream) ->
-  stream.on('data', (tweet) ->
-    io.sockets.emit('msg', tweet)
-  )
-  stream.on('end', (res) -> console.log(res))
-  stream.on('destroy', (res) -> console.log(res))
-  stream.on('error', (error) -> console.log(error))
-)
-
-port = process.env.PORT || 3000
-server.listen(port, -> console.log("listiening on *:#{port}"))
+twit.stream 'statuses/filter', {track: keyword}, (stream) ->
+  stream.on 'data', (tweet) ->
+#     console.log tweet
+    io.sockets.emit 'msg', tweet
+  stream.on 'end', (res) -> console.log 'disconnected'
+  stream.on 'destroy', (res) -> console.log 'destroyed'
+  stream.on 'error', (err) -> console.log err

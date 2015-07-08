@@ -5,24 +5,59 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
     <link href='//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css' rel='stylesheet'>
-    <title>Twitter Stream</title>
+    <title>Twitter Streaming API</title>
+    <style>
+      .icon {
+        display: table-cell;
+        min-width: 63px;
+        padding: 5px 10px 5px 5px;
+        font-size: 13px;
+        font-weight: bold;
+        text-align: center;
+        color: #777;
+      }
+      .body {
+        display: table-cell;
+        vertical-align: top;
+        width: 100%;
+        color: #333;
+        font-size: 15px;
+      }
+      .user_name {
+        font-size: 14px;
+        font-weight: bold;
+        color: #666;
+        margin-right: 5px;
+      }
+      .screen_name {
+        font-size: 12px;
+        font-weight: bold;
+        color: #AAA;
+        margin-right: 5px;
+      }
+      .dt {
+        color: #777;
+        font-size: 13px;
+        margin: 3px 0 0 0;
+      }
+    </style>
   </head>
   <body>
     <header></header>
     <div class='container' id='container'>
       <div class='row'>
         <div class='col-md-12' id="tweet">
-          <div v-repeat='tweets | orderBy "id" -1'>
+          <div class="well" v-repeat='tweets | orderBy "id" -1'>
             <div class="icon">
-              <a href="#">
+              <a v-attr='href: user.url'>
                 <img v-attr='src: user.profile_image_url'>
               </a>
             </div>
-            <div class='text'>
+            <div class='body'>
               <span class='user_name' v-text='user.name'></span>
-              <span class='screen_name' v-text='user.screen_name'></span>
-              <br/>
-              {{text}}
+              <span class='screen_name'>@{{user.screen_name}}</span>
+              <div v-text='text'></div>
+              <p class='dt pull-right' v-text='created_at'></p>
             </div>
           </div>
         </div>
@@ -40,7 +75,7 @@
         el: '#tweet',
         data: {
           tweets: [],
-          limit: 20
+          limit: 30
         },
         methods: {
           append: function(tweet) {
