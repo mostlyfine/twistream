@@ -10,7 +10,7 @@
   "author": "mostlyfine",
   "license": "ISC",
   "readme": "Twitter Streaming for node.js",
-  "devDependencies": {
+  "dependencies": {
     "coffee-script": "*",
     "socket.io": "*",
     "twitter": "*"

@@ -1,1 +1,1 @@
-web: node twistream.coffee
+web: coffee twistream.coffee
