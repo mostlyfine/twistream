@@ -66,6 +66,7 @@
                   <img v-attr="src: media_url">
                 </a>
               </div>
+              <p class='dt pull-right' v-text='created_at | localtime'></p>
             </div>
           </div>
         </div>
@@ -79,6 +80,9 @@
       <script src='//oss.maxcdn.com/respond/1.4.2/respond.min.js'></script>
     <![endif]-->
     <script type="text/javascript">
+      Vue.filter('localtime', function(value) {
+        return new Date(value.replace(/\+0000/, "UTC")).toLocaleString();
+      });
       var vue = new Vue({
         el: '#tweet',
         data: {
