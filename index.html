@@ -61,7 +61,11 @@
               <span class='user_name' v-text='user.name'></span>
               <span class='screen_name'>@{{user.screen_name}}</span>
               <div v-text='text'></div>
-              <p class='dt pull-right' v-text='created_at'></p>
+              <div class="media" v-repeat='entities.media'>
+                <a v-if="type == 'photo'" v-attr="href: expanded_url" target="_blank">
+                  <img v-attr="src: media_url">
+                </a>
+              </div>
             </div>
           </div>
         </div>
