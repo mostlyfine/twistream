@@ -12,12 +12,12 @@ fs = require 'fs'
 server = require('http').createServer (req, res) ->
   res.writeHead 200, {'Content-type': 'text/html'}
   path = req.url.replace(/^\//, '') || 'index.html'
-  fs.createReadStream(path).on('error', (e) -> console.log e).pipe(res)
+  fs.createReadStream(path).on('error', (e) -> console.log path).pipe(res)
 .listen(process.env.PORT || 3000)
 
 io = require('socket.io').listen(server)
 io.sockets.on 'connection', (socket) ->
-  io.sockets.emit 'track', keyword
+  socket.emit 'track', keyword
 
 twit.stream 'statuses/filter', {track: keyword}, (stream) ->
   stream.on 'data', (tweet) ->
