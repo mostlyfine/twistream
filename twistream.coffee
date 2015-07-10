@@ -8,9 +8,11 @@ twit = new twitter({
 
 keyword = process.env.KEYWORD || '#photo'
 
+fs = require 'fs'
 server = require('http').createServer (req, res) ->
   res.writeHead 200, {'Content-type': 'text/html'}
-  res.end require('fs').readFileSync('index.html')
+  path = req.url.replace(/^\//, '') || 'index.html'
+  fs.createReadStream(path).on('error', (e) -> console.log e).pipe(res)
 .listen(process.env.PORT || 3000)
 
 io = require('socket.io').listen(server)
