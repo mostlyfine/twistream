@@ -16,6 +16,8 @@ server = require('http').createServer (req, res) ->
 .listen(process.env.PORT || 3000)
 
 io = require('socket.io').listen(server)
+io.sockets.on 'connection', (socket) ->
+  io.sockets.emit 'track', keyword
 
 twit.stream 'statuses/filter', {track: keyword}, (stream) ->
   stream.on 'data', (tweet) ->

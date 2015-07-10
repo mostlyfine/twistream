@@ -7,6 +7,9 @@
     <link href='//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css' rel='stylesheet'>
     <title>Twitter Streaming API</title>
     <style>
+      .navbar-default {
+        background-color: #eceae1;
+      }
       .well {
         margin-bottom: 5px;
       }
@@ -45,9 +48,17 @@
       }
     </style>
   </head>
-  <body>
-    <header></header>
-    <div class='container' id='container'>
+  <body id="container">
+    <header>
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <a class="navbar-brand" href="#" v-text="keyword"></a>
+          </div>
+        </div>
+      </nav>
+    </header>
+    <div class='container'>
       <div class='row'>
         <div class='col-md-12' id="tweet">
           <div class="well well-sm" v-repeat='tweets | orderBy "id" -1'>
@@ -83,10 +94,11 @@
         return new Date(value.replace(/\+0000/, "UTC")).toLocaleString();
       });
       var vue = new Vue({
-        el: '#tweet',
+        el: '#container',
         data: {
           tweets: [],
-          limit: 30
+          limit: 30,
+          keyword: ''
         },
         methods: {
           append: function(tweet) {
@@ -101,6 +113,9 @@
       var socket = io.connect();
       socket.on('msg', function(data) {
         vue.append(data);
+      });
+      socket.on('track', function(data) {
+        vue.$data.keyword = data;
       });
     </script>
   </body>
