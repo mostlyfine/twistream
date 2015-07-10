@@ -8,7 +8,6 @@
     <title>Twitter Streaming API</title>
     <style>
       .well {
-        padding: 10px;
         margin-bottom: 5px;
       }
       .icon {
@@ -51,7 +50,7 @@
     <div class='container' id='container'>
       <div class='row'>
         <div class='col-md-12' id="tweet">
-          <div class="well" v-repeat='tweets | orderBy "id" -1'>
+          <div class="well well-sm" v-repeat='tweets | orderBy "id" -1'>
             <div class="icon">
               <a v-attr='href: user.url'>
                 <img v-attr='src: user.profile_image_url'>
@@ -63,7 +62,7 @@
               <div v-text='text'></div>
               <div class="media" v-repeat='entities.media'>
                 <a v-if="type == 'photo'" v-attr="href: expanded_url" target="_blank">
-                  <img v-attr="src: media_url">
+                  <img class="img-responsive img-thumbnail" v-attr="src: media_url">
                 </a>
               </div>
               <p class='dt pull-right' v-text='created_at | localtime'></p>
