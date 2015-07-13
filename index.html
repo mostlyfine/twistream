@@ -70,7 +70,7 @@
             <div class='body'>
               <span class='user_name' v-text='user.name'></span>
               <span class='screen_name'>@{{user.screen_name}}</span>
-              <div v-text='text'></div>
+              <div v-html='text | linktext'></div>
               <div class="media" v-repeat='entities.media'>
                 <a v-if="type == 'photo'" v-attr="href: expanded_url" target="_blank">
                   <img class="img-responsive img-thumbnail" v-attr="src: media_url">
@@ -92,6 +92,9 @@
     <script type="text/javascript">
       Vue.filter('localtime', function(value) {
         return new Date(value.replace(/\+0000/, "UTC")).toLocaleString();
+      });
+      Vue.filter('linktext', function(value) {
+          return value.replace(/(https?:\/\/[-_.!~*\'\(\)a-zA-Z0-9;\/?:\@&=+\$,%#]+)/g, "<a href='$1' target='_blank'>$1</a>");
       });
       var vue = new Vue({
         el: '#container',
