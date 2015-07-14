@@ -66,6 +66,7 @@
               <a v-attr='href: user.url'>
                 <img v-attr='src: user.profile_image_url'>
               </a>
+              <span v-if='retweeted_status.retweet_count > 0'>{{retweeted_status.retweet_count}} RT</span>
             </div>
             <div class='body'>
               <span class='user_name' v-text='user.name'></span>
