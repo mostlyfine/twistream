@@ -25,7 +25,7 @@ io.sockets.on 'connection', (socket) ->
 
 twit.stream 'statuses/filter', {track: keyword}, (stream) ->
   stream.on 'data', (tweet) ->
-#     console.log tweet
+    console.log tweet if process.env.DEBUG
     tweets.push(tweet)
     tweets.shift if tweets.length > 20
     io.sockets.emit 'msg', tweet
