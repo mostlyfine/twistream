@@ -15,13 +15,19 @@ server = require('http').createServer (req, res) ->
   fs.createReadStream(path).on('error', (e) -> console.log path).pipe(res)
 .listen(process.env.PORT || 3000)
 
+tweets = []
+
 io = require('socket.io').listen(server)
 io.sockets.on 'connection', (socket) ->
   socket.emit 'track', keyword
+  tweets.forEach (e, i) ->
+    socket.emit 'msg', e
 
 twit.stream 'statuses/filter', {track: keyword}, (stream) ->
   stream.on 'data', (tweet) ->
 #     console.log tweet
+    tweets.push(tweet)
+    tweets.shift if tweets.length > 20
     io.sockets.emit 'msg', tweet
   stream.on 'end', (res) -> console.log 'disconnected'
   stream.on 'destroy', (res) -> console.log 'destroyed'
