@@ -10,9 +10,6 @@
       .navbar-default {
         background-color: #eceae1;
       }
-      .well {
-        margin-bottom: 5px;
-      }
       .icon {
         display: table-cell;
         min-width: 63px;
@@ -46,6 +43,15 @@
         font-size: 13px;
         margin: 3px 0 0 0;
       }
+      .well {
+        transition: all .5s ease;
+        overflow: hidden;
+        margin-bottom: 5px;
+      }
+      .well.v-enter, .well.v-leave {
+        height: 0;
+        opacity: 0;
+      }
     </style>
   </head>
   <body id="container">
@@ -71,7 +77,7 @@
     <div class='container'>
       <div class='row'>
         <div class='col-md-12' id="tweet">
-          <div class="well well-sm" v-repeat='tweets | orderBy "id" -1'>
+          <div class="well well-sm" v-repeat='tweets | orderBy "id" -1' v-transition transition-mode="in-out">
             <div class="icon">
               <a v-attr='href: user.url'>
                 <img v-attr='src: user.profile_image_url'>
