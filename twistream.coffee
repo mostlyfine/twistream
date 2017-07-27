@@ -1,4 +1,6 @@
 twitter = require 'twitter'
+util = require 'util'
+
 twit = new twitter({
   consumer_key: process.env.TWITTER_CONSUMER_KEY,
   consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
@@ -26,6 +28,7 @@ io.sockets.on 'connection', (socket) ->
 twit.stream 'statuses/filter', {track: keyword}, (stream) ->
   stream.on 'data', (tweet) ->
     console.log tweet if process.env.DEBUG
+    console.log util.format("%s\t%s\t%s\t%s", tweet.id, tweet.created_at, tweet.user.screen_name, tweet.text)
     tweets.push(tweet)
     tweets.shift if tweets.length > 20
     io.sockets.emit 'msg', tweet
