@@ -4,8 +4,8 @@
     <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
-    <link href='//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css' rel='stylesheet'>
-    <title>Twitter Streaming API</title>
+    <link href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' rel='stylesheet'>
+    <title>Twitter Search Streaming</title>
     <style>
       .navbar-default {
         background-color: #eceae1;
@@ -13,7 +13,7 @@
       .icon {
         display: table-cell;
         min-width: 63px;
-        padding: 5px 10px 5px 5px;
+        padding: 5px 10px 0px 0px;
         font-size: 13px;
         font-weight: bold;
         text-align: center;
@@ -44,88 +44,134 @@
         margin: 3px 0 0 0;
       }
       .well {
-        transition: all .5s ease;
         overflow: hidden;
         margin-bottom: 5px;
       }
-      .well.v-enter, .well.v-leave {
-        height: 0;
-        opacity: 0;
+      .v-enter {
+        transform: translateY(-30px);
+      }
+      .v-move:not(.v-leave-active) {
+          transition: transform 1s;
       }
     </style>
   </head>
-  <body id="container">
-    <header>
+  <body>
+    <div id="container">
       <nav class="navbar navbar-default">
         <div class="container-fluid">
           <div class="navbar-header">
             <a class="navbar-brand" href="#" v-text="keyword"></a>
           </div>
 
-          <div class="navbar-collapse">
-            <ul class="nav navbar-nav navbar-right">
-              <li v-cloak>
-              <a href="https://twitter.com/intent/tweet?button_hashtag={{ keyword.replace(/^#/,'') }}">
-                  <button v-cloak class="btn btn-primary btn-xs">Tweet {{keyword}}</button>
-                </a>
-              </li>
-            </ul>
+          <div class="collapse navbar-collapse">
+            <p class="navbar-text navbar-right">
+              <a :href="'https://twitter.com/intent/tweet?button_hashtag=' + keyword.replace(/^#/,'')">
+                <button class="btn btn-primary btn-xs" v-text="'Tweet ' + keyword"></button>
+              </a>
+            </p>
           </div>
+
         </div>
       </nav>
-    </header>
-    <div class='container'>
-      <div class='row'>
-        <div class='col-md-12' id="tweet">
-          <div class="well well-sm" v-repeat='tweets | orderBy "id" -1' v-transition transition-mode="in-out">
-            <div class="icon">
-              <a v-attr='href: user.url'>
-                <img v-attr='src: user.profile_image_url'>
-              </a>
-              <span v-if='retweeted_status.retweet_count > 0' v-cloak>{{retweeted_status.retweet_count}} RT</span>
+
+      <div class='container'>
+        <div class='row'>
+          <transition-group class='col-md-12' tag="div">
+            <div class="well well-sm" v-for="tweet in orderedTweets" :key="tweet.id">
+              <user-component v-if="tweet.retweeted_status && tweet.retweeted_status.retweet_count > 0" :tweet="tweet.retweeted_status" :retweeted_by="tweet.user"></user-component>
+              <user-component v-else :tweet="tweet"></user-component>
             </div>
-            <div class='body'>
-              <span class='user_name' v-text='user.name'></span>
-              <span class='screen_name' v-cloak>@{{user.screen_name}}</span>
-              <div v-html='text | linktext'></div>
-              <div class="media" v-repeat='entities.media'>
-                <a v-if="type == 'photo'" v-attr="href: expanded_url" target="_blank">
-                  <img class="img-responsive img-thumbnail" v-attr="src: media_url">
-                </a>
-              </div>
-              <p class='dt pull-right' v-text='created_at | localtime'></p>
-            </div>
-          </div>
+          </transition-group>
         </div>
       </div>
+
+      <footer class='footer'>
+        <div class="container">&copy; since 2016 by @mostlyfine</div>
+      </footer>
     </div>
-    <footer class='footer'></footer>
+
+    <script type="text/x-template" id="user-component">
+      <div>
+        <div class="icon">
+          <a :href="tweet.user.url">
+            <img :src="tweet.user.profile_image_url"/>
+          </a>
+          <span v-if="retweeted_by" v-cloak>{{tweet.retweet_count}} RT</span>
+        </div>
+        <div class="body">
+          <span class="user_name" v-text="tweet.user.name"></span>
+          <span class='screen_name' v-cloak>@{{tweet.user.screen_name}}</span>
+          <div v-html="linktext"></div>
+          <div class="media" v-for='media in tweet.entities.media'>
+            <a v-if="media.type == 'photo'" :href="media.expanded_url" target="_blank">
+              <img class="img-responsive img-thumbnail" :src="media.media_url">
+            </a>
+          </div>
+          <p class='dt pull-right' v-cloak>
+            <span v-if="retweeted_by">@{{ retweeted_by.screen_name }}がリツート</span>
+            {{tweet.created_at | dateFormat}}
+          </p>
+        </div>
+      </div>
+    </script>
+
     <script src="/socket.io/socket.io.js"></script>
-    <script src='//cdnjs.cloudflare.com/ajax/libs/vue/0.11.5/vue.min.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.13/vue.min.js'></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.5/lodash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js"></script>
+
     <!--[if lt IE 9]>
-      <script src='//html5shim.googlecode.com/svn/trunk/html5.js'></script>
-      <script src='//oss.maxcdn.com/respond/1.4.2/respond.min.js'></script>
+      <script src='https://html5shim.googlecode.com/svn/trunk/html5.js'></script>
+      <script src='https://oss.maxcdn.com/respond/1.4.2/respond.min.js'></script>
     <![endif]-->
+
     <script type="text/javascript">
-      Vue.filter('localtime', function(value) {
-        return new Date(value.replace(/\+0000/, "UTC")).toLocaleString();
+      Vue.filter('dateFormat', function(value, format) {
+        moment.lang('ja');
+        format = format || 'YYYY-MM-DD H:mm:ss';
+        return moment(value).format(format);
       });
-      Vue.filter('linktext', function(value) {
-          return value.replace(/(https?:\/\/[-_.!~*\'\(\)a-zA-Z0-9;\/?:\@&=+\$,%#]+)/g, "<a href='$1' target='_blank'>$1</a>");
+
+      Vue.component('user-component', {
+        props: ['tweet', 'retweeted_by'],
+        computed: {
+          linktext: function() {
+            var text = this.tweet.text.replace(/(https?:\/\/[-_.!~*\'\(\)a-zA-Z0-9;\/?:\@&=+\$,%#]+)/g, "<a href='$1' target='_blank'>$1</a>");
+            text = text.replace(/#(\w+)/g, "<a href='https://twitter.com/hashtag/$1'>#$1</a>");
+            text = text.replace(/@(\w+)/g, "<a href='https://twitter.com/$1'>@$1</a>");
+            return text;
+          }
+        },
+        template: '#user-component'
       });
+
       var vue = new Vue({
         el: '#container',
         data: {
           tweets: [],
           limit: 30,
-          keyword: ''
+          keyword: 'Now Loading...',
+          debug: false
+        },
+        computed: {
+          orderedTweets: function() {
+            return _.orderBy(this.tweets, ['id'], ['desc']);
+          }
         },
         methods: {
+          setKeyword: function(keyword) {
+            this.keyword = keyword;
+            this.log(keyword);
+          },
           append: function(tweet) {
             this.tweets.push(tweet);
             if(this.tweets.length > this.limit) {
               this.tweets.shift();
             }
+            this.log(tweet);
+          },
+          log: function(msg) {
+            if(this.debug) { console.log(msg) };
           }
         }
       });
@@ -135,10 +181,9 @@
         vue.append(data);
       });
       socket.on('track', function(data) {
-        vue.$data.keyword = data;
+        vue.setKeyword(data);
       });
     </script>
-    <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
   </body>
 </html>
 
