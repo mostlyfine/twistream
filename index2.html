@@ -177,11 +177,11 @@
       });
 
       var socket = io.connect();
-      socket.on('msg', function(data) {
+      var keyword = "#オリンピック";
+      socket.emit('join', keyword);
+      socket.on(keyword, function(data) {
+        console.log(data);
         vue.append(data);
-      });
-      socket.on('track', function(data) {
-        vue.setKeyword(data);
       });
     </script>
   </body>
