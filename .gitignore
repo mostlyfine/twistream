@@ -1,3 +1,4 @@
+.node-version
 *.swp
 .envrc
 node_modules/

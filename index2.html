@@ -145,22 +145,31 @@
         template: '#user-component'
       });
 
+      var socket = io.connect();
       var vue = new Vue({
         el: '#container',
         data: {
           tweets: [],
           limit: 30,
           keyword: 'Now Loading...',
-          debug: true
+          debug: false
         },
         computed: {
           orderedTweets: function() {
             return _.orderBy(this.tweets, ['id'], ['desc']);
           }
         },
+        created: function() {
+          var that = this;
+          this.setKeyword(this.getParameter('keyword'));
+          socket.on(this.keyword, function(data) {
+            that.append(data);
+          });
+        },
         methods: {
           setKeyword: function(keyword) {
-            this.keyword = keyword;
+            this.keyword = keyword || 'photo';
+            socket.emit('join', keyword);
             this.log(keyword);
           },
           append: function(tweet) {
@@ -170,18 +179,22 @@
             }
             this.log(tweet);
           },
+          getParameter: function(k) {
+            var vars = {};
+            var param = location.search.substring(1).split('&');
+            for(var i = 0; i < param.length; i++) {
+              var keySearch = param[i].search(/=/);
+              var key = '';
+              if(keySearch != -1) key = param[i].slice(0, keySearch);
+              var val = param[i].slice(param[i].indexOf('=', 0) + 1);
+              if(key != '') vars[key] = decodeURI(val);
+            }
+            return k ? vars[k] : vars;
+          },
           log: function(msg) {
             if(this.debug) { console.log(msg) };
           }
         }
-      });
-
-      var socket = io.connect();
-      var keyword = "#オリンピック";
-      socket.emit('join', keyword);
-      socket.on(keyword, function(data) {
-        console.log(data);
-        vue.append(data);
       });
     </script>
   </body>
